@@ -17,7 +17,6 @@ const prompts = [
     "名前は何ですか",
     "あなたの名前は",
     "名前を教えてください",
-    "あなたの名前は何ですか",
     "自分をどう呼びますか"
   ],
   ["愛してます"],
@@ -66,7 +65,7 @@ const replies = [
 ];
 
 const alternative = [
-  "同じ",
+  "同じです",
   "続けて...",
   "兄弟...",
   "もう一度試して",
@@ -74,7 +73,7 @@ const alternative = [
   "わかりません :/"
 ];
 
-const robot = ["どうも、同じ人間だね", "私はボットではありません"];
+const robot = ["どうも、友人の人間", "私はボットではありません"];
 
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
@@ -93,12 +92,11 @@ function output(input) {
     .replace(/私の気分は/g, "")
     .replace(/何/g, "何ですか")
     .replace(/お願いします/g, "")
-    .replace(/お願いします/g, "")
     .replace(/あなたは/g, "あなたは");
 
   if (compare(prompts, replies, text)) {
     product = compare(prompts, replies, text);
-  } else if (text.match(/ありがとう/gi)) {
+  } else if (text.includes("ありがとう")) {
     product = "どういたしまして！";
   } else if (text.match(/(ロボット|ボット|ロボ)/gi)) {
     product = robot[Math.floor(Math.random() * robot.length)];
