@@ -14,8 +14,10 @@ const prompts = [
   ["あなたは誰ですか", "人間ですか", "ボットですか", "あなたは人間かボットか"],
   ["誰があなたを作ったの", "誰が作りましたか"],
   [
-    "あなたの名前は何ですか",
+    "名前は何ですか",
+    "あなたの名前は",
     "名前を教えてください",
+    "あなたの名前は何ですか",
     "自分をどう呼びますか"
   ],
   ["愛してます"],
@@ -33,10 +35,11 @@ const prompts = [
 ];
 
 const replies = [
-  ["こんにちは！", "やあ！", "おはよう！", "こんばんは！"],
+  ["こんにちは！", "やあ！", "おはよう！", "やあ、元気？", "どうも"],
   [
     "元気です...あなたは？",
-    "まあまあです、あなたはどうですか？"
+    "まあまあです、あなたはどうですか？",
+    "素晴らしいです、あなたは？"
   ],
   [
     "特に何も",
@@ -47,7 +50,7 @@ const replies = [
   ["私は無限です"],
   ["私はただのボットです。あなたは？"],
   ["私を作ったのは、JavaScriptです"],
-  ["名前は持っていません", "名前はありません"],
+  ["私は名前がありません", "名前は持っていません"],
   ["私も愛してる", "私もだよ"],
   ["悪い気分になったことはありますか？", "それを聞いて嬉しいです"],
   ["なぜ？", "それは良くない！", "テレビを見てみて"],
@@ -67,11 +70,11 @@ const alternative = [
   "続けて...",
   "兄弟...",
   "もう一度試して",
-  "聞いてます...",
-  "理解できません :/"
+  "聞いています...",
+  "わかりません :/"
 ];
 
-const robot = ["あなたはどう？", "私はボットではありません"];
+const robot = ["どうも、同じ人間だね", "私はボットではありません"];
 
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
@@ -90,13 +93,14 @@ function output(input) {
     .replace(/私の気分は/g, "")
     .replace(/何/g, "何ですか")
     .replace(/お願いします/g, "")
+    .replace(/お願いします/g, "")
     .replace(/あなたは/g, "あなたは");
 
   if (compare(prompts, replies, text)) {
     product = compare(prompts, replies, text);
   } else if (text.match(/ありがとう/gi)) {
     product = "どういたしまして！";
-  } else if (text.match(/(ボット|ロボ)/gi)) {
+  } else if (text.match(/(ロボット|ボット|ロボ)/gi)) {
     product = robot[Math.floor(Math.random() * robot.length)];
   } else {
     product = alternative[Math.floor(Math.random() * alternative.length)];
@@ -152,8 +156,4 @@ function formatDate(date) {
   const h = "0" + date.getHours();
   const m = "0" + date.getMinutes();
   return `${h.slice(-2)}:${m.slice(-2)}`;
-}
-
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
 }
