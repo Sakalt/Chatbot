@@ -4,73 +4,87 @@ const msgerChat = get(".msger-chat");
 const BOT_IMG = "bot.png";
 const PERSON_IMG = "user.png";
 const BOT_NAME = "BOT";
-const PERSON_NAME = "Coderider";
+const PERSON_NAME = "ももんが";
+
 const prompts = [
-  ["hi", "hey", "hello", "good morning", "good afternoon"],
-  ["how are you", "how is life", "how are things"],
-  ["what are you doing", "what is going on", "what is up"],
-  ["how old are you"],
-  ["who are you", "are you human", "are you bot", "are you human or bot"],
-  ["who created you", "who made you"],
+  ["こんにちは", "やあ", "おはよう", "こんばんは"],
+  ["元気ですか", "調子はどうですか"],
+  ["何をしているの", "どうしたの", "何かあったの"],
+  ["あなたは何歳ですか"],
+  ["あなたは誰ですか", "人間ですか", "ボットですか", "あなたは人間かボットか"],
+  ["誰があなたを作ったの", "誰が作りましたか"],
   [
-    "your name please",
-    "your name",
-    "may i know your name",
-    "what is your name",
-    "what call yourself"
+    "名前は何ですか",
+    "あなたの名前は",
+    "名前を教えてください",
+    "あなたの名前は何ですか",
+    "自分をどう呼びますか"
   ],
-  ["i love you"],
-  ["happy", "good", "fun", "wonderful", "fantastic", "cool"],
-  ["bad", "bored", "tired"],
-  ["help me", "tell me story", "tell me joke"],
-  ["ah", "yes", "ok", "okay", "nice"],
-  ["bye", "good bye", "goodbye", "see you later"],
-  ["what should i eat today"],
-  ["bro"],
-  ["what", "why", "how", "where", "when"],
-  ["no", "not sure", "maybe", "no thanks"],
+  ["愛してます"],
+  ["楽しい", "良い", "素晴らしい", "最高", "クール"],
+  ["悪い", "つまらない", "疲れた"],
+  ["助けて", "話をして", "ジョークを言って"],
+  ["ああ", "はい", "わかりました", "いいえ"],
+  ["さようなら", "バイバイ", "またね"],
+  ["今日は何を食べればいいですか"],
+  ["兄弟"],
+  ["何", "なぜ", "どう", "どこ", "いつ"],
+  ["いいえ", "わからない", "多分", "いいえ、ありがとう"],
   [""],
-  ["haha", "ha", "lol", "hehe", "funny", "joke"]
-]
-const replies = [
-  ["Hello!", "Hi!", "Hey!", "Hi there!", "Howdy"],
-  [
-    "Fine... how are you?",
-    "Pretty well, how are you?",
-    "Fantastic, how are you?"
-  ],
-  [
-    "Nothing much",
-    "About to go to sleep",
-    "Can you guess?",
-    "I don't know actually"
-  ],
-  ["I am infinite"],
-  ["I am just a bot", "I am a bot. What are you?"],
-  ["The one true God, JavaScript"],
-  ["I am nameless", "I don't have a name"],
-  ["I love you too", "Me too"],
-  ["Have you ever felt bad?", "Glad to hear it"],
-  ["Why?", "Why? You shouldn't!", "Try watching TV"],
-  ["What about?", "Once upon a time..."],
-  ["Tell me a story", "Tell me a joke", "Tell me about yourself"],
-  ["Bye", "Goodbye", "See you later"],
-  ["Sushi", "Pizza"],
-  ["Bro!"],
-  ["Great question"],
-  ["That's ok", "I understand", "What do you want to talk about?"],
-  ["Please say something :("],
-  ["Haha!", "Good one!"]
+  ["ハハ", "ハ", "笑", "おもしろい", "ジョーク"]
 ];
-const alternative = [
-  "Same",
-  "Go on...",
-  "Bro...",
-  "Try again",
-  "I'm listening...",
-  "I don't understand :/"
-]
-const robot = ["How do you do, fellow human", "I am not a bot"];
+
+const replies = [
+  ["こんにちは！", "やあ！", "おはよう！", "やあ、元気？", "どうも"],
+  [
+    "元気です...あなたは？",
+    "まあまあです、あなたはどうですか？",
+    "素晴らしいです、あなたは？"
+  ],
+  [
+    "特に何も",
+    "もうすぐ寝るところ",
+    "何か当ててみて",
+    "実はわからない"
+  ],
+  ["私は無限です"],
+  ["私はただのボットです。あなたは？"],
+  ["私を作ったのは、JavaScriptです"],
+  ["私は名前がありません", "名前は持っていません"],
+  ["私も愛してる", "私もだよ"],
+  ["悪い気分になったことはありますか？", "それを聞いて嬉しいです"],
+  ["なぜ？", "それは良くない！", "テレビを見てみて"],
+  ["何についてですか？", "昔々..."],
+  ["物語を教えて", "ジョークを言って", "自己紹介して"],
+  ["さようなら", "バイバイ", "またね"],
+  ["寿司", "ピザ"],
+  ["兄弟！"],
+  ["良い質問"],
+  ["大丈夫です", "理解しています", "何を話したいですか？"],
+  ["何か言ってください :("],
+  ["ハハ！", "いいね！"]
+];
+
+// Brain.jsのセットアップ
+const brain = require('brain.js');
+const net = new brain.NeuralNetwork();
+
+// トレーニングデータの生成
+const trainingData = [];
+
+// プロンプトとリプライをトレーニングデータに変換
+for (let i = 0; i < prompts.length; i++) {
+  for (let j = 0; j < prompts[i].length; j++) {
+    trainingData.push({
+      input: { [prompts[i][j]]: 1 },
+      output: { [replies[i][Math.floor(Math.random() * replies[i].length)]]: 1 }
+    });
+  }
+}
+
+// ネットワークをトレーニング
+net.train(trainingData);
+
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
   const msgText = msgerInput.value;
@@ -79,48 +93,32 @@ msgerForm.addEventListener("submit", event => {
   addChat(PERSON_NAME, PERSON_IMG, "right", msgText);
   output(msgText);
 });
+
 function output(input) {
   let product;
   let text = input.toLowerCase().replace(/[^\w\s]/gi, "").replace(/[\d]/gi, "").trim();
   text = text
     .replace(/ a /g, " ")  
-    .replace(/i feel /g, "")
-    .replace(/whats/g, "what is")
-    .replace(/please /g, "")
-    .replace(/ please/g, "")
-    .replace(/r u/g, "are you");
-  if (compare(prompts, replies, text)) {
-    product = compare(prompts, replies, text);
-  } else if (text.match(/thank/gi)) {
-    product = "You're welcome!"
-  } else if (text.match(/(robot|bot|robo)/gi)) {
-    product = robot[Math.floor(Math.random() * robot.length)];
-  } else {
+    .replace(/私の気分は/g, "")
+    .replace(/何/g, "何ですか")
+    .replace(/お願いします/g, "")
+    .replace(/お願いします/g, "")
+    .replace(/あなたは/g, "あなたは");
+
+  // Brain.jsを使って応答を生成
+  const outputResponse = net.run({ [text]: 1 });
+  product = Object.keys(outputResponse).reduce((a, b) => outputResponse[a] > outputResponse[b] ? a : b);
+
+  if (!product) {
     product = alternative[Math.floor(Math.random() * alternative.length)];
   }
+
   const delay = input.split(" ").length * 100;
   setTimeout(() => {
     addChat(BOT_NAME, BOT_IMG, "left", product);
   }, delay);
 }
-function compare(promptsArray, repliesArray, string) {
-  let reply;
-  let replyFound = false;
-  for (let x = 0; x < promptsArray.length; x++) {
-    for (let y = 0; y < promptsArray[x].length; y++) {
-      if (promptsArray[x][y] === string) {
-        let replies = repliesArray[x];
-        reply = replies[Math.floor(Math.random() * replies.length)];
-        replyFound = true;
-        break;
-      }
-    }
-    if (replyFound) {
-      break;
-    }
-  }
-  return reply;
-}
+
 function addChat(name, img, side, text) {
   const msgHTML = `
     <div class="msg ${side}-msg">
@@ -137,14 +135,13 @@ function addChat(name, img, side, text) {
   msgerChat.insertAdjacentHTML("beforeend", msgHTML);
   msgerChat.scrollTop += 500;
 }
+
 function get(selector, root = document) {
   return root.querySelector(selector);
 }
+
 function formatDate(date) {
   const h = "0" + date.getHours();
   const m = "0" + date.getMinutes();
   return `${h.slice(-2)}:${m.slice(-2)}`;
-}
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
 }
