@@ -3,8 +3,8 @@ const msgerInput = get(".msger-input");
 const msgerChat = get(".msger-chat");
 const BOT_IMG = "bot.png";
 const PERSON_IMG = "user.png";
-const BOT_NAME = "BOT";
-const PERSON_NAME = "ユーザー"; // ユーザー名を「ユーザー」に変更
+const BOT_NAME = "ボット";
+const PERSON_NAME = "ユーザー";
 
 const prompts = [
   ["こんにちは", "やあ", "おはよう", "こんばんは"],
@@ -14,10 +14,8 @@ const prompts = [
   ["あなたは誰ですか", "人間ですか", "ボットですか", "あなたは人間かボットか"],
   ["誰があなたを作ったの", "誰が作りましたか"],
   [
-    "名前は何ですか",
-    "あなたの名前は",
-    "名前を教えてください",
     "あなたの名前は何ですか",
+    "名前を教えてください",
     "自分をどう呼びますか"
   ],
   ["愛してます"],
@@ -35,11 +33,10 @@ const prompts = [
 ];
 
 const replies = [
-  ["こんにちは！", "やあ！", "おはよう！", "やあ、元気？", "どうも"],
+  ["こんにちは！", "やあ！", "おはよう！", "こんばんは！"],
   [
     "元気です...あなたは？",
-    "まあまあです、あなたはどうですか？",
-    "素晴らしいです、あなたは？"
+    "まあまあです、あなたはどうですか？"
   ],
   [
     "特に何も",
@@ -50,7 +47,7 @@ const replies = [
   ["私は無限です"],
   ["私はただのボットです。あなたは？"],
   ["私を作ったのは、JavaScriptです"],
-  ["私は名前がありません", "名前は持っていません"],
+  ["名前は持っていません", "名前はありません"],
   ["私も愛してる", "私もだよ"],
   ["悪い気分になったことはありますか？", "それを聞いて嬉しいです"],
   ["なぜ？", "それは良くない！", "テレビを見てみて"],
@@ -65,24 +62,16 @@ const replies = [
   ["ハハ！", "いいね！"]
 ];
 
-// Brain.jsのセットアップ
-const brain = new brain.NeuralNetwork();
+const alternative = [
+  "同じ",
+  "続けて...",
+  "兄弟...",
+  "もう一度試して",
+  "聞いてます...",
+  "理解できません :/"
+];
 
-// トレーニングデータの生成
-const trainingData = [];
-
-// プロンプトとリプライをトレーニングデータに変換
-for (let i = 0; i < prompts.length; i++) {
-  for (let j = 0; j < prompts[i].length; j++) {
-    trainingData.push({
-      input: { [prompts[i][j]]: 1 },
-      output: { [replies[i][Math.floor(Math.random() * replies[i].length)]]: 1 }
-    });
-  }
-}
-
-// ネットワークをトレーニング
-brain.train(trainingData);
+const robot = ["あなたはどう？", "私はボットではありません"];
 
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
@@ -103,11 +92,13 @@ function output(input) {
     .replace(/お願いします/g, "")
     .replace(/あなたは/g, "あなたは");
 
-  // Brain.jsを使って応答を生成
-  const outputResponse = brain.run({ [text]: 1 });
-  product = Object.keys(outputResponse).reduce((a, b) => outputResponse[a] > outputResponse[b] ? a : b);
-
-  if (!product) {
+  if (compare(prompts, replies, text)) {
+    product = compare(prompts, replies, text);
+  } else if (text.match(/ありがとう/gi)) {
+    product = "どういたしまして！";
+  } else if (text.match(/(ボット|ロボ)/gi)) {
+    product = robot[Math.floor(Math.random() * robot.length)];
+  } else {
     product = alternative[Math.floor(Math.random() * alternative.length)];
   }
 
@@ -115,6 +106,25 @@ function output(input) {
   setTimeout(() => {
     addChat(BOT_NAME, BOT_IMG, "left", product);
   }, delay);
+}
+
+function compare(promptsArray, repliesArray, string) {
+  let reply;
+  let replyFound = false;
+  for (let x = 0; x < promptsArray.length; x++) {
+    for (let y = 0; y < promptsArray[x].length; y++) {
+      if (promptsArray[x][y] === string) {
+        let replies = repliesArray[x];
+        reply = replies[Math.floor(Math.random() * replies.length)];
+        replyFound = true;
+        break;
+      }
+    }
+    if (replyFound) {
+      break;
+    }
+  }
+  return reply;
 }
 
 function addChat(name, img, side, text) {
@@ -142,4 +152,8 @@ function formatDate(date) {
   const h = "0" + date.getHours();
   const m = "0" + date.getMinutes();
   return `${h.slice(-2)}:${m.slice(-2)}`;
+}
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
 }
