@@ -4,7 +4,7 @@ const msgerChat = get(".msger-chat");
 const BOT_IMG = "bot.png";
 const PERSON_IMG = "user.png";
 const BOT_NAME = "BOT";
-const PERSON_NAME = "ももんが";
+const PERSON_NAME = "ユーザー"; // ユーザー名を「ユーザー」に変更
 
 const prompts = [
   ["こんにちは", "やあ", "おはよう", "こんばんは"],
@@ -66,8 +66,7 @@ const replies = [
 ];
 
 // Brain.jsのセットアップ
-const brain = require('brain.js');
-const net = new brain.NeuralNetwork();
+const brain = new brain.NeuralNetwork();
 
 // トレーニングデータの生成
 const trainingData = [];
@@ -83,7 +82,7 @@ for (let i = 0; i < prompts.length; i++) {
 }
 
 // ネットワークをトレーニング
-net.train(trainingData);
+brain.train(trainingData);
 
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
@@ -102,11 +101,10 @@ function output(input) {
     .replace(/私の気分は/g, "")
     .replace(/何/g, "何ですか")
     .replace(/お願いします/g, "")
-    .replace(/お願いします/g, "")
     .replace(/あなたは/g, "あなたは");
 
   // Brain.jsを使って応答を生成
-  const outputResponse = net.run({ [text]: 1 });
+  const outputResponse = brain.run({ [text]: 1 });
   product = Object.keys(outputResponse).reduce((a, b) => outputResponse[a] > outputResponse[b] ? a : b);
 
   if (!product) {
