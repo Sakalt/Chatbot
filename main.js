@@ -3,7 +3,7 @@ const msgerInput = get(".msger-input");
 const msgerChat = get(".msger-chat");
 const BOT_IMG = "bot.png";
 const PERSON_IMG = "user.png";
-const BOT_NAME = "ボット";
+const BOT_NAME = "BOT";
 const PERSON_NAME = "ユーザー";
 
 const prompts = [
@@ -17,6 +17,7 @@ const prompts = [
     "名前は何ですか",
     "あなたの名前は",
     "名前を教えてください",
+    "あなたの名前は何ですか",
     "自分をどう呼びますか"
   ],
   ["愛してます"],
@@ -68,12 +69,29 @@ const alternative = [
   "同じです",
   "続けて...",
   "兄弟...",
-  "もう一度試して",
-  "聞いています...",
+  "再試行",
+  "聞いてます...",
   "わかりません :/"
 ];
 
-const robot = ["どうも、友人の人間", "私はボットではありません"];
+const robot = ["人間の友よ、どうしたの？", "私はボットではない"];
+
+const brain = new brain.NeuralNetwork();
+
+const trainingData = [];
+
+// プロンプトとリプライをトレーニングデータに変換
+for (let i = 0; i < prompts.length; i++) {
+  for (let j = 0; j < prompts[i].length; j++) {
+    trainingData.push({
+      input: { [prompts[i][j]]: 1 },
+      output: { [replies[i][Math.floor(Math.random() * replies[i].length)]]: 1 }
+    });
+  }
+}
+
+// ネットワークをトレーニング
+brain.train(trainingData);
 
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
@@ -87,20 +105,12 @@ msgerForm.addEventListener("submit", event => {
 function output(input) {
   let product;
   let text = input.toLowerCase().replace(/[^\w\s]/gi, "").replace(/[\d]/gi, "").trim();
-  text = text
-    .replace(/ a /g, " ")  
-    .replace(/私の気分は/g, "")
-    .replace(/何/g, "何ですか")
-    .replace(/お願いします/g, "")
-    .replace(/あなたは/g, "あなたは");
 
-  if (compare(prompts, replies, text)) {
-    product = compare(prompts, replies, text);
-  } else if (text.includes("ありがとう")) {
-    product = "どういたしまして！";
-  } else if (text.match(/(ロボット|ボット|ロボ)/gi)) {
-    product = robot[Math.floor(Math.random() * robot.length)];
-  } else {
+  // Brain.jsを使って応答を生成
+  const outputResponse = brain.run({ [text]: 1 });
+  product = Object.keys(outputResponse).reduce((a, b) => outputResponse[a] > outputResponse[b] ? a : b);
+
+  if (!product) {
     product = alternative[Math.floor(Math.random() * alternative.length)];
   }
 
@@ -108,25 +118,6 @@ function output(input) {
   setTimeout(() => {
     addChat(BOT_NAME, BOT_IMG, "left", product);
   }, delay);
-}
-
-function compare(promptsArray, repliesArray, string) {
-  let reply;
-  let replyFound = false;
-  for (let x = 0; x < promptsArray.length; x++) {
-    for (let y = 0; y < promptsArray[x].length; y++) {
-      if (promptsArray[x][y] === string) {
-        let replies = repliesArray[x];
-        reply = replies[Math.floor(Math.random() * replies.length)];
-        replyFound = true;
-        break;
-      }
-    }
-    if (replyFound) {
-      break;
-    }
-  }
-  return reply;
 }
 
 function addChat(name, img, side, text) {
