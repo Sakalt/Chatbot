@@ -96,11 +96,25 @@ brain.train(trainingData);
 msgerForm.addEventListener("submit", event => {
   event.preventDefault();
   const msgText = msgerInput.value;
-  if (!msgText) return;
+  if (!msgText) {
+    displayError("メッセージを入力してください。");
+    return;
+  }
   msgerInput.value = "";
   addChat(PERSON_NAME, PERSON_IMG, "right", msgText);
   output(msgText);
 });
+
+function displayError(message) {
+  const errorMessageElement = get(".error-message");
+  errorMessageElement.textContent = message;
+  errorMessageElement.style.display = "block";
+
+  // エラーを数秒後に非表示にする
+  setTimeout(() => {
+    errorMessageElement.style.display = "none";
+  }, 3000);
+}
 
 function output(input) {
   let product;
